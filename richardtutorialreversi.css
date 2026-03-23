@@ -1,0 +1,32 @@
+/**
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * richardtutorialreversi implementation : © <Your name here> <Your email address here>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ */
+
+/********* You can start writing your CSS below this line: **********/
+#board {
+  width: 536px;
+  height: 528px;
+  background-image: url("img/board.jpg");
+}
+
+#board {
+  width: 536px;
+  height: 528px;
+  background-image: url("img/board.jpg");
+  position: relative;
+}
+
+.square {
+  width: 62px;
+  height: 62px;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
