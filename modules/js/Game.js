@@ -16,6 +16,8 @@
  * onEnteringState, onLeavingState and onPlayerActivationChange are predefined names that will be called by the framework.
  * When executing code in this state, you can access the args using this.args
  */
+const BgaAnimations = await importEsmLib("bga-animations", "1.x");
+
 class PlayerTurn {
   constructor(game, bga) {
     this.game = game;
@@ -93,6 +95,10 @@ export class Game {
     console.log("Starting game setup");
     this.gamedatas = gamedatas;
 
+    this.animationManager = new BgaAnimations.Manager({
+      animationsActive: () => this.bga.gameui.bgaAnimationsActive(),
+    });
+
     // Example to add a div on the game area
     this.bga.gameArea.getElement().insertAdjacentHTML(
       "beforeend",
@@ -142,6 +148,15 @@ export class Game {
       }
     }
 
+    // this.addDiscOnBoard(2, 2, this.bga.players.getCurrentPlayerId(), false);
+    for (var i in gamedatas.board) {
+      const square = gamedatas.board[i];
+
+      if (square.player !== null) {
+        this.addDiscOnBoard(square.x, square.y, square.player);
+      }
+    }
+
     // Setup game notifications to handle (see "setupNotifications" method below)
     this.setupNotifications();
 
@@ -150,6 +165,30 @@ export class Game {
 
   ///////////////////////////////////////////////////
   //// Utility methods
+  async addDiscOnBoard(x, y, playerId, animate = true) {
+    const color = this.gamedatas.players[playerId].color;
+    const discId = `disc_${x}_${y}`;
+
+    document.getElementById(`square_${x}_${y}`).insertAdjacentHTML(
+      "beforeend",
+      `
+                <div class="disc" data-color="${color}" id="${discId}">
+                    <div class="disc-faces">
+                        <div class="disc-face" data-side="white"></div>
+                        <div class="disc-face" data-side="black"></div>
+                    </div>
+                </div>
+            `,
+    );
+
+    if (animate) {
+      const element = document.getElementById(discId);
+      await this.animationManager.fadeIn(
+        element,
+        document.getElementById(`overall_player_board_${playerId}`),
+      );
+    }
+  }
 
   /*
     

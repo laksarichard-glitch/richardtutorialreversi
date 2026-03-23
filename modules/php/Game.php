@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -14,6 +15,7 @@
  *
  * In this PHP file, you are going to defines the rules of the game.
  */
+
 declare(strict_types=1);
 
 namespace Bga\Games\richardtutorialreversi;
@@ -26,6 +28,8 @@ class Game extends \Bga\GameFramework\Table
     public static array $CARD_TYPES;
 
     public PlayerCounter $playerEnergy;
+
+    public BoardManager $boardManager;
 
     /**
      * Your global variables labels:
@@ -66,6 +70,8 @@ class Game extends \Bga\GameFramework\Table
             
             return $args;
         });*/
+
+        $this->boardManager = new BoardManager($this);
     }
 
     /**
@@ -97,21 +103,21 @@ class Game extends \Bga\GameFramework\Table
      */
     public function upgradeTableDb($from_version)
     {
-//       if ($from_version <= 1404301345)
-//       {
-//            // ! important ! Use `DBPREFIX_<table_name>` for all tables
-//
-//            $sql = "ALTER TABLE `DBPREFIX_xxxxxxx` ....";
-//            $this->applyDbUpgradeToAllDB( $sql );
-//       }
-//
-//       if ($from_version <= 1405061421)
-//       {
-//            // ! important ! Use `DBPREFIX_<table_name>` for all tables
-//
-//            $sql = "CREATE TABLE `DBPREFIX_xxxxxxx` ....";
-//            $this->applyDbUpgradeToAllDB( $sql );
-//       }
+        //       if ($from_version <= 1404301345)
+        //       {
+        //            // ! important ! Use `DBPREFIX_<table_name>` for all tables
+        //
+        //            $sql = "ALTER TABLE `DBPREFIX_xxxxxxx` ....";
+        //            $this->applyDbUpgradeToAllDB( $sql );
+        //       }
+        //
+        //       if ($from_version <= 1405061421)
+        //       {
+        //            // ! important ! Use `DBPREFIX_<table_name>` for all tables
+        //
+        //            $sql = "CREATE TABLE `DBPREFIX_xxxxxxx` ....";
+        //            $this->applyDbUpgradeToAllDB( $sql );
+        //       }
     }
 
     /*
@@ -134,7 +140,13 @@ class Game extends \Bga\GameFramework\Table
         );
         $this->playerEnergy->fillResult($result);
 
+        $result["players"] = $this->getCollectionFromDb(
+            "SELECT `player_id` `id`, `player_score` `score`, `player_color` `color` FROM `player`"
+        );
+
         // TODO: Gather all information about current game situation (visible by player $currentPlayerId).
+        // Get reversi board token
+        $result['board'] = $this->boardManager->getOccupiedDiscs();
 
         return $result;
     }
@@ -150,7 +162,7 @@ class Game extends \Bga\GameFramework\Table
         // Set the colors of the players with HTML color code. The default below is red/green/blue/orange/brown. The
         // number of colors defined here must correspond to the maximum number of players allowed for the gams.
         $gameinfos = $this->getGameinfos();
-        $default_colors = $gameinfos['player_colors'];
+        $default_colors = ["ffffff", "000000"];
 
         foreach ($players as $player_id => $player) {
             // Now you can access both $player_id and $player array
@@ -172,7 +184,6 @@ class Game extends \Bga\GameFramework\Table
             )
         );
 
-        $this->reattributeColorsBasedOnPreferences($players, $gameinfos["player_colors"]);
         $this->reloadPlayersBasicInfos();
 
         // Init global values with their initial values.
@@ -186,6 +197,9 @@ class Game extends \Bga\GameFramework\Table
         // $this->playerStats->init('player_teststat1', 0);
 
         // TODO: Setup the initial game situation here.
+        list($blackplayer_id, $whiteplayer_id) = array_keys($players);
+        // Init the board
+        $this->boardManager->initializeBoard(8, (int) $blackplayer_id, (int) $whiteplayer_id);
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
@@ -198,14 +212,16 @@ class Game extends \Bga\GameFramework\Table
      * Here, jump to a state you want to test (by default, jump to next player state)
      * You can trigger it on Studio using the Debug button on the right of the top bar.
      */
-    public function debug_goToState(int $state = 3) {
+    public function debug_goToState(int $state = 3)
+    {
         $this->gamestate->jumpToState($state);
     }
 
     /**
      * Another example of debug function, to easily test the zombie code.
      */
-    public function debug_playOneMove() {
+    public function debug_playOneMove()
+    {
         $this->bga->debug->playUntil(fn(int $count) => $count == 1);
     }
 
