@@ -11,6 +11,8 @@
  *
  */
 
+import { PlayerTurn } from "./PlayerTurn.js";
+
 /**
  * We create one State class per declared state on the PHP side, to handle all state specific code here.
  * onEnteringState, onLeavingState and onPlayerActivationChange are predefined names that will be called by the framework.
