@@ -8,11 +8,11 @@ export class PlayerTurn {
    * This method is called each time we are entering the game state. You can use this method to perform some user interface changes at this moment.
    */
   onEnteringState(args, isCurrentPlayerActive) {
-    this.bga.statusBar.setTitle(
-      isCurrentPlayerActive
-        ? _("${you} must play a counter")
-        : _("${actplayer} must play a counter"),
-    );
+    // this.bga.statusBar.setTitle(
+    //   isCurrentPlayerActive
+    //     ? _("${you} must play a counter")
+    //     : _("${actplayer} must play a counter"),
+    // );
   }
 
   /**
