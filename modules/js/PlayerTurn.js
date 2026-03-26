@@ -3,40 +3,36 @@ export class PlayerTurn {
     this.game = game;
     this.bga = bga;
   }
-
-  /**
-   * This method is called each time we are entering the game state. You can use this method to perform some user interface changes at this moment.
-   */
   onEnteringState(args, isCurrentPlayerActive) {
-    // this.bga.statusBar.setTitle(
-    //   isCurrentPlayerActive
-    //     ? _("${you} must play a counter")
-    //     : _("${actplayer} must play a counter"),
-    // );
+    this.bga.statusBar.setTitle(
+      isCurrentPlayerActive
+        ? _("${you} must play a disc_xx")
+        : _("${actplayer} must play a disc_xx"),
+    );
+
+    if (isCurrentPlayerActive) {
+      this.updatePossibleMoves(args.possibleMoves);
+    }
   }
+  updatePossibleMoves(possibleMoves) {
+    // Remove current possible moves
+    document
+      .querySelectorAll(".possibleMove")
+      .forEach((div) => div.classList.remove("possibleMove"));
 
-  /**
-   * This method is called each time we are leaving the game state. You can use this method to perform some user interface changes at this moment.
-   */
-  onLeavingState(args, isCurrentPlayerActive) {}
+    for (let x in possibleMoves) {
+      for (let y in possibleMoves[x]) {
+        // x,y is a possible move
+        document
+          .getElementById(`square_${x}_${y}`)
+          .classList.add("possibleMove");
+      }
+    }
 
-  /**
-   * This method is called each time the current player becomes active or inactive in a MULTIPLE_ACTIVE_PLAYER state. You can use this method to perform some user interface changes at this moment.
-   * on MULTIPLE_ACTIVE_PLAYER states, you may want to call this function in onEnteringState using `this.onPlayerActivationChange(args, isCurrentPlayerActive)` at the end of onEnteringState.
-   * If your state is not a MULTIPLE_ACTIVE_PLAYER one, you can delete this function.
-   */
-  onPlayerActivationChange(args, isCurrentPlayerActive) {}
-
-  onCardClick(card_id) {
-    console.log("onCardClick", card_id);
-
-    this.bga.actions
-      .performAction("actPlayCard", {
-        card_id,
-      })
-      .then(() => {
-        // What to do after the server call if it succeeded
-        // (most of the time, nothing, as the game will react to notifs / change of state instead, so you can delete the `then`)
-      });
+    this.bga.gameui.addTooltipToClass(
+      "possibleMove",
+      "",
+      _("Place a disc here_zz"),
+    );
   }
 }

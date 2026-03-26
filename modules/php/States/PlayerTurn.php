@@ -17,10 +17,14 @@ class PlayerTurn extends GameState
             id: 10,
             type: StateType::ACTIVE_PLAYER,
 
-            description: clienttranslate('${actplayer} must play a disc'),
-            descriptionMyTurn: clienttranslate('${you} must play a disc'),
         );
     }
 
     function zombie(int $playerId) {}
+    function getArgs(int $activePlayerId): array
+    {
+        return [
+            'possibleMoves' => $this->game->boardManager->getPossibleMoves($activePlayerId)
+        ];
+    }
 }
